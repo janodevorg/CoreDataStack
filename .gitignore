@@ -1,0 +1,10 @@
+.build
+.DS_Store
+.swiftpm
+build
+env
+Package.resolved
+xcshareddata
+xcuserdata
+docs/all_identifiers.txt
+docs/all_symbols.txt

@@ -1,0 +1,56 @@
+name: CoreDataStack
+
+options:
+  bundleIdPrefix: dev.jano.coredatastack
+  usesTabs: false
+  indentWidth: 4
+  tabWidth: 4
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: 15.2
+    
+settings:
+    CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+
+targets:
+
+  CoreDataStack:
+    type: framework
+    platform: iOS
+    postCompileScripts:
+      - script: swiftlint
+        name: Swiftlint
+    scheme:
+      testTargets:
+         - name: CoreDataStackTests
+           parallelizable: true
+           randomExecutionOrder: true
+    settings:
+       CURRENT_PROJECT_VERSION: 1
+       INFOPLIST_FILE: targets/main/Info.plist
+       IPHONEOS_DEPLOYMENT_TARGET: 15.2
+       PRODUCT_BUNDLE_IDENTIFIER: dev.jano.coredatastack
+       PRODUCT_NAME: CoreDataStack
+    sources: 
+       - sources/main
+    type: framework
+
+  CoreDataStackTests:
+    dependencies:
+      - target: CoreDataStack
+    type: bundle.unit-test
+    platform: iOS
+    scheme:
+      gatherCoverageData: true
+      commandLineArguments: 
+          "--unit-testing": true
+      testTargets: 
+        - name: CoreDataStackTests
+          parallelizable: true
+          randomExecutionOrder: true
+    settings:
+      INFOPLIST_FILE: targets/tests/Info.plist
+      IPHONEOS_DEPLOYMENT_TARGET: 15.2
+      PRODUCT_BUNDLE_IDENTIFIER: dev.jano.coredatastack.tests
+    sources:
+      - sources/tests
