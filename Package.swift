@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "CoreDataStack",
     platforms: [
-        .iOS(.v15), .macOS(.v12)
+        .iOS(.v15)
     ],
     products: [
         .library(name: "CoreDataStack", type: .dynamic, targets: ["CoreDataStack"]),
