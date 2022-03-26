@@ -8,3 +8,4 @@ xcshareddata
 xcuserdata
 docs/all_identifiers.txt
 docs/all_symbols.txt
+*.xcodeproj
