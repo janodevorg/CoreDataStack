@@ -9,7 +9,7 @@ struct Person: Codable {
 }
 
 extension Person: Persistable {
-    public func mapPersistable(context: NSManagedObjectContext) -> PersonMO {
+    public func mapPersistable(context: NSManagedObjectContext) -> PersonMO? {
         PersonMO(model: self, context: context)
     }
 }
