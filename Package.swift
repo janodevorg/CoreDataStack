@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "CoreDataStackStatic", type: .static, targets: ["CoreDataStack"])
     ],
     dependencies: [
-        .package(url: "git@github.com:janodevorg/Kit.git", branch: "main"),
+        .package(url: "git@github.com:janodevorg/Kit.git", from: "1.0.0"),
         .package(url: "git@github.com:apple/swift-docc-plugin.git", from: "1.0.0")
     ],
     targets: [
