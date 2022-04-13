@@ -1,11 +1,13 @@
+*.xcodeproj
 .build
 .DS_Store
 .swiftpm
 build
+docs/all_identifiers.txt
+docs/all_symbols.txt
 env
+Package.local.swift
+Package.remote.swift
 Package.resolved
 xcshareddata
 xcuserdata
-docs/all_identifiers.txt
-docs/all_symbols.txt
-*.xcodeproj
