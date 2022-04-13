@@ -24,10 +24,36 @@ open class PersistentContainer: NSPersistentContainer
     }
 
     /// Remove the existing database.
-    public func wipeSQLDatabase() {
+    public func wipeSQLDatabase(backupFirst: Bool = true) {
         log.info("Removing existing database.")
         let url = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("\(modelName).sqlite")
-        try? FileManager.default.removeItem(at: url)
+        do {
+            if backupFirst {
+                try backup(url: url)
+            }
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            log.error("\(String(describing: error))")
+        }
+    }
+
+    // Backup the file at `url` with suffix `.backup-yyyy-MM-ddTHHmmss`.
+    private func backup(url: URL) throws {
+        let backup = url.appendingPathExtension("backup-\(dateTag())")
+        if FileManager.default.fileExists(atPath: backup.path) {
+            try FileManager.default.removeItem(at: backup)
+        }
+        log.info("Backed up at \(backup.absoluteString) ")
+        try FileManager.default.copyItem(atPath: url.path, toPath: backup.path)
+    }
+
+    // Returns the current date with format `yyyy-MM-dd'T'HHmmss`.
+    private func dateTag() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HHmmss"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.string(from: Date())
     }
 
     /**
@@ -59,6 +85,7 @@ open class PersistentContainer: NSPersistentContainer
         persistentStoreDescriptions = [
             inMemory ? inMemoryStoreDescription : sqliteStoreDescription
         ]
+        log.debug("PersistentStore loaded: \(String(describing: self.persistentStoreDescriptions))")
     }
 
     private var context: NSManagedObjectContext {
