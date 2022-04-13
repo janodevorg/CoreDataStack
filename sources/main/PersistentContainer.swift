@@ -2,7 +2,7 @@ import CoreData
 import Foundation
 import os
 
-public class PersistentContainer: NSPersistentContainer
+open class PersistentContainer: NSPersistentContainer
 {
     private let log = Logger(subsystem: "dev.jano", category: "persistence")
 
