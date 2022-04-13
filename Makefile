@@ -7,21 +7,7 @@ TARGET_NAME = $(shell swift package dump-package | jq '.products[0].name' | tr -
 TARGET_NAME_LOWERCASE = $(shell echo ${TARGET_NAME} | tr '[:upper:]' '[:lower:]')
 GITHUB_USER = janodevorg
 
-.PHONY: clean help project requirebrew requirexcodegen resetgit swiftdoc swiftlint test xcodegen
-
-help: requirebrew requirexcodegen 
-	@echo Usage:
-	@echo ""
-	@echo "  make clean       - removes all generated products"
-	@echo "  make docc        - Generate documentation"
-	@echo "  make doccapp     - Generate documentation for UIKit project"
-	@echo "  make project     - generates a xcode project with local dependencies"
-	@echo "  make projecttest - Run tests using xcodebuild and a generated project"
-	@echo "  make spmcache    - Remove SPM cache"
-	@echo "  make swiftbuild  - compile package using swift build"
-	@echo "  make swiftlint   - Run swiftlint"
-	@echo "  make swifttest   - test package using swift test"
-	@echo ""
+.PHONY: clean help docc doccapp projectgen projecttest simbuild simtest trashall trashcache trashderived
 
 clean:
 	rm -rf .build
@@ -29,6 +15,21 @@ clean:
 	rm -rf build
 	rm -rf docs
 	rm -rf Package.resolved
+
+help: 
+	@echo Usage:
+	@echo ""
+	@echo "  make clean        - removes all generated products"
+	@echo "  make docc         - Generate documentation"
+	@echo "  make doccapp      - Generate documentation for UIKit project"
+	@echo "  make projectgen   - generates a xcode project with local dependencies"
+	@echo "  make projecttest  - Run tests using xcodebuild and a generated project"
+	@echo "  make simbuild     - compile package using swift build"
+	@echo "  make simtest      - test package using swift test"
+	@echo "  make trashall     - Trash SPM cache and Derived Data"
+	@echo "  make trashcache   - Trash SPM cache"
+	@echo "  make trashderived - Trash Derived Data"
+	@echo ""
 
 docc: requirejq
 	rm -rf docs
@@ -59,31 +60,23 @@ doccapp: requirejq
 	@echo "Check https://${GITHUB_USER}.github.io/${TARGET_NAME}/documentation/${TARGET_NAME_LOWERCASE}/"
 	@echo ""
 
-swiftlint:
-	swift run swiftlint
-
-swiftbuild: 
-	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
-	swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios15.4-simulator" 
-
-swifttest: 
-	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
-	swift test -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios15.4-simulator" 
+projectgen: requirexcodegen
+	rm -rf "${PROJECT_NAME}.xcodeproj"; \
+	xcodegen generate --project . --spec project.yml; \
+	echo Generated ${PROJECT_NAME}.xcodeproj
 
 projecttest: project
 	@echo project name is ${PROJECT_NAME}
 	xcodebuild test -project ${PROJECT_NAME}.xcodeproj -scheme ${PROJECT_NAME} -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12,OS=latest' CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
-
-project: requirexcodegen
-	rm -rf "${PROJECT_NAME}.xcodeproj"; \
-	xcodegen generate --project . --spec project.yml; \
-	echo Generated ${PROJECT_NAME}.xcodeproj
 
 requirebrew:
 	@if ! command -v brew &> /dev/null; then echo "Please install brew from https://brew.sh/"; exit 1; fi
 
 requirejq:
 	@if ! command -v jq &> /dev/null; then echo "Please install jq using 'brew install jq'"; exit 1; fi
+
+requiretrash:
+	@if ! command -v trash &> /dev/null; then echo "Please install jq using 'brew install trash'"; exit 1; fi
 
 requirexcodegen: requirebrew
 	@if ! command -v xcodegen &> /dev/null; then echo "Please install xcodegen using 'brew install xcodegen'"; exit 1; fi
@@ -102,8 +95,20 @@ resetgit:
 	git tag 1.0.0; \
 	git push origin main --tags
 
-spmcache:
-	rm -rf ~/Library/Caches/org.swift.swiftpm/
+simbuild: 
+	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
+	swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios15.4-simulator" 
 
-list:
-	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
+simtest: 
+	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
+	swift test -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios15.4-simulator" 
+
+trashall: requiretrash
+	trash ~/Library/Caches/org.swift.swiftpm/ || true
+	trash ~/Library/Developer/Xcode/DerivedData/* || true
+
+trashcache: requiretrash
+	trash ~/Library/Caches/org.swift.swiftpm/
+
+trashderived: requiretrash
+	trash ~/Library/Developer/Xcode/DerivedData/*
