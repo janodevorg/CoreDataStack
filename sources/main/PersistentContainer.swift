@@ -109,7 +109,7 @@ open class PersistentContainer: NSPersistentContainer
     // MARK: -
 
     /**
-     Query with a predicate.
+     Return entities matching a predicate.
 
      The queried entity is passed as a generic parameter.
      - Parameter predicate: The predicate for a fetch request.
@@ -123,6 +123,17 @@ open class PersistentContainer: NSPersistentContainer
             fetchRequest.predicate = predicate
             return try context.fetch(fetchRequest)
         }
+    }
+
+    /**
+     Return all entities of the given generic type.
+
+     The queried entity is passed as a generic parameter.
+     - Returns: Zero or more managed objects.
+     */
+    @MainActor
+    public func read<T: NSManagedObject>() throws -> [T] {
+        try read(predicate: nil)
     }
 
     /**
