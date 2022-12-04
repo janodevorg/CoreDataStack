@@ -1,10 +1,11 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "CoreDataStack",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v15),
+        .macOS(.v13)
     ],
     products: [
         .library(name: "CoreDataStack", type: .dynamic, targets: ["CoreDataStack"]),
@@ -25,7 +26,8 @@ let package = Package(
             ],
             path: "sources/tests",
             resources: [
-                .process("resources")
+                .process("resources"),
+                .process("Model.xcdatamodeld")
             ]
         )
     ]
