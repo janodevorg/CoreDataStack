@@ -1,6 +1,5 @@
 import CoreData
 import CoreDataStack
-import struct Kit.BundleFile
 import XCTest
 
 final class MOTestCase: XCTestCase
