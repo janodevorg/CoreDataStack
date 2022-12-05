@@ -30,4 +30,4 @@ jobs:
       - name: Build
         run: |
           swift package generate-xcodeproj
-          xcodebuild build -destination 'name=iPhone 13' -scheme 'CoreDataStack-Package'
+          xcodebuild build -destination 'name=iPhone 14' -scheme 'CoreDataStack-Package'
