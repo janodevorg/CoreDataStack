@@ -5,7 +5,7 @@ let package = Package(
     name: "CoreDataStack",
     platforms: [
         .iOS(.v15),
-        .macOS(.v13)
+        .macOS(.v12)
     ],
     products: [
         .library(name: "CoreDataStack", type: .static, targets: ["CoreDataStack"]),
