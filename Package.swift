@@ -8,8 +8,8 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .library(name: "CoreDataStack", type: .dynamic, targets: ["CoreDataStack"]),
-        .library(name: "CoreDataStackStatic", type: .static, targets: ["CoreDataStack"])
+        .library(name: "CoreDataStack", type: .static, targets: ["CoreDataStack"]),
+        .library(name: "CoreDataStackDynamic", type: .dynamic, targets: ["CoreDataStack"])
     ],
     dependencies: [
         .package(url: "git@github.com:apple/swift-docc-plugin.git", from: "1.0.0")
