@@ -1,33 +1,27 @@
+# This action runs on a local github runner
+# See https://jano.dev/programming/2022/04/15/local-spm-ga.html
+
+# To install xcpretty run:
+# brew install ruby
+# echo 'export PATH="/opt/homebrew/opt/ruby/bin:$PATH"' >> ~/.zshrc
+# brew install xcpretty
+
 name: Swift
 on: [push]
 jobs:
-
-  build:
-    runs-on: [self-hosted, X64, macOS]
+  ios-latest:
+    name: Unit Tests (iOS 16.4, Xcode 14.3)
+    runs-on: [self-hosted]
+    env: 
+      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
-      
-      - name: Trust GitHub SSH keys
-        run: for ip in $(dig @8.8.8.8 github.com +short); do ssh-keyscan github.com,$ip; ssh-keyscan $ip; done 2>/dev/null >> ~/.ssh/known_hosts
-          
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          name: id_rsa 
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-          if_key_exists: ignore
-
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Lint
-        run: swiftlint
-
-      # if the latest version is not supported, just uncomment this so it uses the default version in your self-hosted runner
-      - name: Setup latest Swift
-        uses: fwal/setup-swift@v1.20.0
-
-      - name: Build
+      - uses: actions/checkout@v3
+      - name: Generate project
         run: |
-          swift package generate-xcodeproj
-          xcodebuild build -destination 'name=iPhone 14' -scheme 'CoreDataStack-Package'
+          xcodegen
+      - name: Build iOS
+        run: |
+          set -o pipefail && xcodebuild build -scheme "CoreDataStack" -destination "OS=16.4,name=iPhone 14 Pro" -skipPackagePluginValidation | xcbeautify
+      - name: Build Mac
+        run: |
+          set -o pipefail && xcodebuild build -scheme "CoreDataStack" -destination "platform=macOS,arch=arm64" -skipPackagePluginValidation | xcbeautify
