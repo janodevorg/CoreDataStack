@@ -1,0 +1,1 @@
+Source code for the article <a href="https://jano.dev/apple/coredata/2024/12/26/Core-Data-Stack.html">A Minimal Core Data Stack</a>.

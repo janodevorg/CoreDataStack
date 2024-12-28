@@ -1,0 +1,5 @@
+# [tools]
+# tuist = "4.38.1"
+
+[tools.tuist]
+version = "latest"

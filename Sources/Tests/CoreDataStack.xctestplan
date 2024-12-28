@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "5A635DBB-397C-4F94-8BA5-791B26E8505C",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:CoreDataStack.xcodeproj",
+          "identifier" : "3825D5F50DFE0CB574A9A069",
+          "name" : "CoreDataStack"
+        }
+      ]
+    },
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:CoreDataStack.xcodeproj",
+      "identifier" : "3825D5F50DFE0CB574A9A069",
+      "name" : "CoreDataStack"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:CoreDataStack.xcodeproj",
+        "identifier" : "84EFBEDB728CD8351FD40F77",
+        "name" : "CoreDataStackTests"
+      }
+    }
+  ],
+  "version" : 1
+}

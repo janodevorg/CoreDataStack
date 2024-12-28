@@ -1,0 +1,11 @@
+{
+  "age": 10,
+  "id": "778EEED8-1E8B-4B5A-A5BA-2F6A12BFF261",
+  "name": "alice",
+  "dogs": [
+    {
+      "id": "6B28FEEA-ECE9-40BE-B2F3-351DDAC55984",
+      "name" : "Oreo"
+    }
+  ]
+}
