@@ -7,9 +7,9 @@
 # TARGET_NAME_LOWERCASE = $(shell echo ${TARGET_NAME} | tr '[:upper:]' '[:lower:]')
 # GITHUB_USER = janodevorg
 
-.PHONY: clean help project requirebrew requirexcodegen resetgit swiftdoc swiftlint test xcodegen
+.PHONY: clean help project requirebrew requiretuist resetgit swiftdoc swiftlint test xcodegen
 
-help: requirebrew requirexcodegen 
+help: requirebrew requiretuist 
 	@echo Usage:
 	@echo ""
 	@echo "  make clean       - removes all generated products"
@@ -17,6 +17,7 @@ help: requirebrew requirexcodegen
 	@echo "  make doccapp     - Generate documentation for UIKit project"
 	@echo "  make project     - generates a xcode project with local dependencies"
 	@echo "  make projecttest - Run tests using xcodebuild and a generated project"
+	@echo "  make runner      - Run the CI actions locally"
 	@echo "  make spmcache    - Remove SPM cache"
 	@echo "  make swiftbuild  - compile package using swift build"
 	@echo "  make swiftlint   - Run swiftlint"
@@ -64,7 +65,7 @@ swiftlint:
 
 swiftbuild: 
 	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
-	swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios16.1-simulator" 
+	swift build -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios18.2-simulator" 
 
 swiftbuildmac: 
 	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
@@ -72,7 +73,7 @@ swiftbuildmac:
 
 swifttest: 
 	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
-	swift test -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios16.1-simulator" 
+	swift test -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios18.2-simulator" 
 
 swifttestmac: 
 	@if [ ! -f Package.swift ]; then echo "You tried to compile as package but Package.swift doesn’t exist." >&2; exit 1; fi
@@ -82,7 +83,7 @@ projecttest: project
 	@echo project name is ${PROJECT_NAME}
 	xcodebuild test -project ${PROJECT_NAME}.xcodeproj -scheme ${PROJECT_NAME} -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
 
-project: #requirexcodegen
+project: requiretuist
 	rm Grimoire/Info.plist || true
 	cp Grimoire/Info-original.plist Grimoire/Info.plist
 	rm -rf "${PROJECT_NAME}.xcodeproj"
@@ -96,8 +97,11 @@ requirebrew:
 requirejq:
 	@if ! command -v jq &> /dev/null; then echo "Please install jq using 'brew install jq'"; exit 1; fi
 
-requirexcodegen: requirebrew
-	@if ! command -v xcodegen &> /dev/null; then echo "Please install xcodegen using 'brew install xcodegen'"; exit 1; fi
+requirexcbeautify: requirebrew
+	@if ! command -v xcbeautify &> /dev/null; then echo "Please install xcbeautify using 'brew install xcbeautify'"; exit 1; fi
+
+requiretuist: requirebrew
+	@if ! command -v tuist &> /dev/null; then echo "Please install tuist using 'brew install mise; mise install tuist'"; exit 1; fi
 
 resetgit:
 	# @echo "This removes Git history, including tags. Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
@@ -115,6 +119,11 @@ resetgit:
 
 spmcache:
 	rm -rf ~/Library/Caches/org.swift.swiftpm/
+
+runner: requirexcbeautify requiretuist
+	tuist generate --no-open
+	set -o pipefail && xcodebuild build -scheme "CoreDataStack" -destination "OS=18.2,name=iPhone 16 Pro" -skipPackagePluginValidation | xcbeautify
+	set -o pipefail && xcodebuild build -scheme "CoreDataStack" -destination "platform=macOS,arch=arm64" -skipPackagePluginValidation | xcbeautify
 
 list:
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'

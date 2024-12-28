@@ -13,7 +13,7 @@ let project = Project(
     targets: [
         .target(
             name: "CoreDataStack",
-            destinations: .macOS,
+            destinations: [.iPhone, .mac],
             product: .framework,
             bundleId: "dev.jano.coredatastack",
             sources: ["Sources/Main/**"],
@@ -25,7 +25,7 @@ let project = Project(
         ),
         .target(
             name: "CoreDataStackTests",
-            destinations: .macOS,
+            destinations: [.iPhone, .mac],
             product: .unitTests,
             bundleId: "dev.jano.coredatastack.test",
             sources: ["Sources/Tests/**"],
